@@ -33,6 +33,7 @@ function socketManager(io) {
                 players: [{ id: socket.id, username: socket.username, symbol: 'X' }],
                 board: Array(9).fill(null),
                 turn: socket.id,
+                firstTurn: socket.id,
                 winner: null,
                 rematch: []
             };
@@ -101,9 +102,27 @@ function socketManager(io) {
                 lobby.board = Array(9).fill(null);
                 lobby.winner = null;
                 lobby.rematch = [];
-                lobby.turn = lobby.players[0].id;
+                lobby.firstTurn = lobby.firstTurn === lobby.players[0].id ? lobby.players[1].id : lobby.players[0].id;
+                lobby.turn = lobby.firstTurn;
 
                 io.to(roomId).emit('game_reset', lobby);
+            }
+        });
+
+        socket.on('leave_lobby', (roomId) => {
+            const lobby = lobbies.get(roomId);
+            if (!lobby) return;
+
+            const playerIndex = lobby.players.findIndex(p => p.id === socket.id);
+            if (playerIndex !== -1) {
+                lobby.players.splice(playerIndex, 1);
+                socket.leave(roomId);
+
+                if (lobby.players.length === 0) {
+                    lobbies.delete(roomId);
+                } else {
+                    io.to(roomId).emit('player_left', lobby);
+                }
             }
         });
 
