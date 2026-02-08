@@ -14,7 +14,7 @@ const LoginScreen = ({ onLogin }) => {
     return (
         <div className="card">
             <h1 className="title">Tic Tac Toe</h1>
-            <p style={{ color: 'var(--color-text-dim)' }}>Enter your name to start playing online</p>
+            <p style={{ color: 'var(--color-text-dim)' }}>Enter your name to start</p>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div style={{ position: 'relative' }}>
