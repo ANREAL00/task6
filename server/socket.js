@@ -51,7 +51,7 @@ function socketManager(io) {
                 return;
             }
 
-            if (lobby.players.length >= 2) {
+            if (lobby.players.length > 1) {
                 socket.emit('error', 'Lobby is full');
                 return;
             }
