@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
+import { message } from 'antd';
 import LoginScreen from './components/LoginScreen';
 import LobbyScreen from './components/LobbyScreen';
 import GameRoom from './components/GameRoom';
@@ -36,18 +37,22 @@ function App() {
       setLobby(prev => ({ ...prev, board, winner }));
     });
 
+    socket.on('rematch_update', ({ rematch }) => {
+      setLobby(prev => ({ ...prev, rematch }));
+    });
+
     socket.on('game_reset', (resetLobby) => {
       setLobby(resetLobby);
     });
 
     socket.on('player_left', () => {
-      alert('Opponent disconnected.');
+      message.info('Opponent disconnected.');
       setScreen('lobby');
       setLobby(null);
     });
 
     socket.on('error', (msg) => {
-      alert(msg);
+      message.error(msg);
     });
 
     return () => {

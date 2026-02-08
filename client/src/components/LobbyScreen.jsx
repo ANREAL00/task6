@@ -27,7 +27,8 @@ const LobbyScreen = ({ username, onCreateGame, onJoinGame }) => {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            gap: '10px'
+                            gap: '10px',
+                            color: 'var(--color-surface)'
                         }}
                     >
                         <Swords size={20} /> Create New Game

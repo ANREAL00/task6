@@ -69,6 +69,7 @@ function socketManager(io) {
         socket.on('make_move', ({ roomId, index }) => {
             const lobby = lobbies.get(roomId);
             if (!lobby) return;
+            if (lobby.players.length === 1) return;
 
             if (lobby.winner) return;
             if (lobby.turn !== socket.id) return;
@@ -106,6 +107,8 @@ function socketManager(io) {
                 lobby.turn = lobby.firstTurn;
 
                 io.to(roomId).emit('game_reset', lobby);
+            } else {
+                io.to(roomId).emit('rematch_update', { rematch: lobby.rematch });
             }
         });
 

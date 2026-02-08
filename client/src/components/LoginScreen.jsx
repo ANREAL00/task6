@@ -29,7 +29,7 @@ const LoginScreen = ({ onLogin }) => {
                         autoFocus
                     />
                 </div>
-                <button type="submit" style={{ backgroundColor: 'var(--color-primary)', width: '100%' }}>
+                <button type="submit" style={{ backgroundColor: 'var(--color-primary)', width: '100%', color: 'var(--color-surface)' }}>
                     Enter Lobby
                 </button>
             </form>

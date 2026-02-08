@@ -1,4 +1,5 @@
 import React from 'react';
+import { message } from 'antd';
 import Board from './Board';
 import { Copy, RefreshCw, LogOut } from 'lucide-react';
 
@@ -9,7 +10,7 @@ const GameRoom = ({ lobby, username, onMove, onPlayAgain, onLeave }) => {
 
     const copyRoomId = () => {
         navigator.clipboard.writeText(lobby.id);
-        alert('Room ID copied to clipboard!');
+        message.info('Room ID copied to clipboard!');
     };
 
     if (!me) return <div>Loading...</div>;
@@ -29,9 +30,9 @@ const GameRoom = ({ lobby, username, onMove, onPlayAgain, onLeave }) => {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
-                <PlayerBadge player={me} isTurn={lobby.turn === me.id} label={me.username} />
+                <PlayerBadge player={me} isTurn={lobby.turn === me.id} label='YOU' />
                 <div style={{ display: 'flex', alignItems: 'center', fontSize: '1.5rem', fontWeight: 'bold', color: '#64748b' }}>VS</div>
-                <PlayerBadge player={opponent} isTurn={opponent && lobby.turn === opponent.id} label={opponent && opponent.username} />
+                <PlayerBadge player={opponent} isTurn={opponent && lobby.turn === opponent.id} label='OPPONENT' />
             </div>
 
             <div style={{ margin: '0 auto' }}>
@@ -52,12 +53,18 @@ const GameRoom = ({ lobby, username, onMove, onPlayAgain, onLeave }) => {
                         }}>
                             {lobby.winner === 'draw' ? "It's a Draw!" : (lobby.winner === me.symbol ? "You Won!" : "You Lost")}
                         </h3>
-                        <button
-                            onClick={() => onPlayAgain(lobby.id)}
-                            style={{ marginTop: '1rem', background: 'var(--color-primary)', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
-                        >
-                            <RefreshCw size={18} /> Play Again
-                        </button>
+                        {lobby.rematch && lobby.rematch.includes(me.id) ? (
+                            <p style={{ marginTop: '1rem', color: 'var(--color-primary)', fontWeight: 'bold' }}>
+                                Waiting for opponent's decision...
+                            </p>
+                        ) : (
+                            <button
+                                onClick={() => onPlayAgain(lobby.id)}
+                                style={{ marginTop: '1rem', background: 'var(--color-primary)', display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'white' }}
+                            >
+                                <RefreshCw size={18} /> Play Again
+                            </button>
+                        )}
                     </div>
                 ) : (
                     <div>
