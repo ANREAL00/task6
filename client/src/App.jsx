@@ -6,7 +6,7 @@ import LobbyScreen from './components/LobbyScreen';
 import GameRoom from './components/GameRoom';
 import './App.css';
 
-const socket = io('http://localhost:3001');
+const socket = io(process.env.VITE_API_BASE);
 
 function App() {
   const [screen, setScreen] = useState('login');
