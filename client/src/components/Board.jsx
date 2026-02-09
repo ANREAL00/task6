@@ -3,19 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const Board = ({ board, onMove, myTurn, winner }) => {
     return (
-        <div
-            style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '10px',
-                background: '#334155',
-                padding: '10px',
-                borderRadius: 'var(--radius-md)',
-                width: 'fit-content',
-                margin: '0 auto',
-                boxShadow: '0 0 30px rgba(0,0,0,0.5)'
-            }}
-        >
+        <div className="board-container">
             {board.map((cell, index) => (
                 <Square
                     key={index}
@@ -33,25 +21,13 @@ const Square = ({ value, onClick, disabled }) => {
         <button
             onClick={onClick}
             disabled={disabled}
+            className={`square ${!disabled ? "active" : ""}`}
             style={{
-                width: '80px',
-                height: '80px',
-                fontSize: '2.5rem',
-                fontWeight: 'bold',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'var(--color-surface)',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: disabled ? 'default' : 'pointer',
                 color: value === 'X' ? 'var(--color-secondary)' : 'var(--color-primary)',
                 textShadow: value === 'X'
                     ? '0 0 10px var(--color-secondary-glow)'
-                    : '0 0 10px var(--color-primary-glow)',
-                transition: 'background 0.2s',
+                    : '0 0 10px var(--color-primary-glow)'
             }}
-            className={!disabled ? "hover:bg-slate-700" : ""}
         >
             <AnimatePresence>
                 {value && (

@@ -16,21 +16,10 @@ const LobbyScreen = ({ username, onCreateGame, onJoinGame }) => {
             <h2 style={{ fontSize: '2rem', margin: 0 }}>Welcome, {username}!</h2>
             <p style={{ color: 'var(--color-text-dim)' }}>Choose how you want to play</p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1rem' }}>
+            <div className="form-group" style={{ marginTop: '1rem' }}>
 
-                <div style={{ background: 'var(--color-surface)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                    <button
-                        onClick={onCreateGame}
-                        style={{
-                            width: '100%',
-                            background: 'linear-gradient(45deg, var(--color-primary), #60a5fa)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '10px',
-                            color: 'var(--color-surface)'
-                        }}
-                    >
+                <div className="lobby-option">
+                    <button onClick={onCreateGame} className="btn-gradient">
                         <Swords size={20} /> Create New Game
                     </button>
                     <p style={{ fontSize: '0.9rem', color: 'var(--color-text-dim)', marginTop: '0.5rem', textAlign: 'center' }}>
@@ -38,15 +27,15 @@ const LobbyScreen = ({ username, onCreateGame, onJoinGame }) => {
                     </p>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: 'var(--color-text-dim)' }}>
-                    <div style={{ height: '1px', background: '#334155', flex: 1 }}></div>
+                <div className="divider">
+                    <div className="divider-line"></div>
                     <span>OR</span>
-                    <div style={{ height: '1px', background: '#334155', flex: 1 }}></div>
+                    <div className="divider-line"></div>
                 </div>
 
-                <form onSubmit={handleJoin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div style={{ position: 'relative' }}>
-                        <Users size={20} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-dim)' }} />
+                <form onSubmit={handleJoin} className="form-group">
+                    <div className="input-container">
+                        <Users size={20} className="input-icon" />
                         <input
                             type="text"
                             placeholder="Enter Room Code"

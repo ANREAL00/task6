@@ -16,20 +16,20 @@ const GameRoom = ({ lobby, username, onMove, onPlayAgain, onLeave }) => {
     if (!me) return <div>Loading...</div>;
 
     return (
-        <div className="card" style={{ maxWidth: '600px' }}>
+        <div className="card game-card">
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h2 style={{ margin: 0, fontSize: '1.5rem' }}>Room: <span style={{ fontFamily: 'monospace', color: 'var(--color-primary)' }}>{lobby.id}</span></h2>
+            <div className="room-header">
+                <h2 style={{ margin: 0, fontSize: '1.5rem' }}>Room: <span className="room-id">{lobby.id}</span></h2>
                 <button
                     onClick={copyRoomId}
-                    style={{ padding: '0.5rem', background: 'transparent', border: '1px solid #334155', borderRadius: '50%' }}
+                    className="copy-btn"
                     title="Copy Room ID"
                 >
                     <Copy size={16} />
                 </button>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
+            <div className="players-container">
                 <PlayerBadge player={me} isTurn={lobby.turn === me.id} label='YOU' />
                 <div style={{ display: 'flex', alignItems: 'center', fontSize: '1.5rem', fontWeight: 'bold', color: '#64748b' }}>VS</div>
                 <PlayerBadge player={opponent} isTurn={opponent && lobby.turn === opponent.id} label='OPPONENT' />
@@ -44,7 +44,7 @@ const GameRoom = ({ lobby, username, onMove, onPlayAgain, onLeave }) => {
                 />
             </div>
 
-            <div style={{ marginTop: '2rem', textAlign: 'center', minHeight: '60px' }}>
+            <div className="status-container">
                 {lobby.winner ? (
                     <div className="fade-in">
                         <h3 style={{
@@ -80,7 +80,7 @@ const GameRoom = ({ lobby, username, onMove, onPlayAgain, onLeave }) => {
                 )}
             </div>
 
-            <button onClick={() => onLeave(lobby.id)} style={{ background: 'transparent', color: '#ef4444', marginTop: '1rem', border: '1px solid #334155', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <button onClick={() => onLeave(lobby.id)} style={{ background: 'transparent', color: '#ef4444', marginTop: '1rem', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                 <LogOut size={16} /> Leave Game
             </button>
 
@@ -90,30 +90,18 @@ const GameRoom = ({ lobby, username, onMove, onPlayAgain, onLeave }) => {
 
 const PlayerBadge = ({ player, isTurn, label }) => {
     if (!player) return (
-        <div style={{ textAlign: 'center', opacity: 0.5 }}>
-            <div style={{ width: '50px', height: '50px', background: '#334155', borderRadius: '50%', margin: '0 auto 0.5rem' }}></div>
+        <div className="player-badge" style={{ opacity: 0.5 }}>
+            <div className="player-symbol empty"></div>
             Waiting...
         </div>
     );
 
     return (
-        <div style={{
-            textAlign: 'center',
+        <div className="player-badge" style={{
             opacity: isTurn ? 1 : 0.6,
-            transform: isTurn ? 'scale(1.1)' : 'scale(1)',
-            transition: 'all 0.3s'
+            transform: isTurn ? 'scale(1.1)' : 'scale(1)'
         }}>
-            <div style={{
-                width: '50px',
-                height: '50px',
-                background: player.symbol === 'X' ? 'var(--color-secondary)' : 'var(--color-primary)',
-                borderRadius: '50%',
-                margin: '0 auto 0.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
+            <div className={`player-symbol ${player.symbol === 'X' ? 'x' : 'o'}`} style={{
                 boxShadow: isTurn ? `0 0 15px ${player.symbol === 'X' ? 'var(--color-secondary)' : 'var(--color-primary)'}` : 'none'
             }}>
                 {player.symbol}

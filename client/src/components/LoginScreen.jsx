@@ -16,9 +16,9 @@ const LoginScreen = ({ onLogin }) => {
             <h1 className="title">Tic Tac Toe</h1>
             <p style={{ color: 'var(--color-text-dim)' }}>Enter your name to start</p>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ position: 'relative' }}>
-                    <User size={20} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-dim)' }} />
+            <form onSubmit={handleSubmit} className="form-group">
+                <div className="input-container">
+                    <User size={20} className="input-icon" />
                     <input
                         type="text"
                         placeholder="Username"
@@ -29,7 +29,7 @@ const LoginScreen = ({ onLogin }) => {
                         autoFocus
                     />
                 </div>
-                <button type="submit" style={{ backgroundColor: 'var(--color-primary)', width: '100%', color: 'var(--color-surface)' }}>
+                <button type="submit" className="btn-primary">
                     Enter Lobby
                 </button>
             </form>
