@@ -4,7 +4,6 @@ import { message } from 'antd';
 import LoginScreen from './components/LoginScreen';
 import LobbyScreen from './components/LobbyScreen';
 import GameRoom from './components/GameRoom';
-import './App.css';
 
 const socket = io(import.meta.env.VITE_API_BASE);
 
