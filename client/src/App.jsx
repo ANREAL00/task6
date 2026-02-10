@@ -29,15 +29,15 @@ function App() {
     });
 
     socket.on('update_board', ({ board, turn }) => {
-      setLobby(prev => ({ ...prev, board, turn }));
+      setLobby(prev => prev ? { ...prev, board, turn } : null);
     });
 
     socket.on('game_over', ({ winner, board }) => {
-      setLobby(prev => ({ ...prev, board, winner }));
+      setLobby(prev => prev ? { ...prev, board, winner } : null);
     });
 
     socket.on('rematch_update', ({ rematch }) => {
-      setLobby(prev => ({ ...prev, rematch }));
+      setLobby(prev => prev ? { ...prev, rematch } : null);
     });
 
     socket.on('game_reset', (resetLobby) => {
