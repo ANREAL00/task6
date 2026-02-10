@@ -110,7 +110,7 @@ function App() {
           username={username}
           onCreateGame={handleCreateGame}
           onJoinGame={handleJoinGame}
-          onPlayWithBot={handleCreateGameWithBot}
+          onCreateGameWithBot={handleCreateGameWithBot}
         />
       )}
 

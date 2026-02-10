@@ -22,11 +22,17 @@ const LobbyScreen = ({ username, onCreateGame, onCreateGameWithBot, onJoinGame }
                     <button onClick={onCreateGame} className="btn-gradient">
                         <Swords size={20} /> Create New Game
                     </button>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--color-text-dim)', marginTop: '0.5rem', textAlign: 'center' }}>
+                        Start a new game and invite a friend.
+                    </p>
+                </div>
+
+                <div className="lobby-option">
                     <button onClick={onCreateGameWithBot} className="btn-gradient">
                         <Bot size={20} /> Play with Bot
                     </button>
                     <p style={{ fontSize: '0.9rem', color: 'var(--color-text-dim)', marginTop: '0.5rem', textAlign: 'center' }}>
-                        Start a new game and invite a friend.
+                        Play against the Bot.
                     </p>
                 </div>
 
