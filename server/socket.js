@@ -181,12 +181,23 @@ function socketManager(io) {
                     lobby.turn = socket.id;
                 }
 
+                const otherPlayer = lobby.players.find(p => p.username !== currentUsername);
+                if (otherPlayer && lobby.turn !== socket.id && lobby.turn !== otherPlayer.id && lobby.turn !== BOT_ID) {
+                    const moveCount = lobby.board.filter(cell => cell !== null).length;
+                    const firstPlayerSymbol = lobby.players[0].symbol;
+                    const currentMoveSymbol = moveCount % 2 === 0 ? firstPlayerSymbol : (firstPlayerSymbol === 'X' ? 'O' : 'X');
+                    const playerWithTurn = lobby.players.find(p => p.symbol === currentMoveSymbol);
+                    if (playerWithTurn) {
+                        lobby.turn = playerWithTurn.id;
+                    }
+                }
+
                 io.to(roomId).emit('player_reconnected', lobby);
             }
 
             if (lobby.winner) return;
 
-            const isOurTurn = (lobby.turn === socket.id) || (player && lobby.turn === currentUsername);
+            const isOurTurn = (lobby.turn === socket.id);
 
             if (!isOurTurn) return;
 
