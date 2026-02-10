@@ -170,10 +170,20 @@ function socketManager(io) {
             if (lobby.players.length === 1 && !lobby.playWithBot) return;
 
             if (lobby.winner) return;
+
+            let player = lobby.players.find(p => p.username === socket.username);
+            if (player && player.id !== socket.id) {
+                player.id = socket.id;
+                socket.join(roomId);
+                if (lobby.turn === player.username) {
+                    lobby.turn = socket.id;
+                }
+            }
+
             if (lobby.turn !== socket.id) return;
             if (lobby.board[index] !== null) return;
 
-            const player = lobby.players.find(p => p.id === socket.id);
+            player = lobby.players.find(p => p.id === socket.id);
             if (!player) return;
 
             lobby.board[index] = player.symbol;
@@ -254,6 +264,10 @@ function socketManager(io) {
             for (const [roomId, lobby] of lobbies.entries()) {
                 const playerIndex = lobby.players.findIndex(p => p.id === socket.id);
                 if (playerIndex !== -1) {
+                    if (lobby.playWithBot) {
+                        continue;
+                    }
+
                     lobby.players.splice(playerIndex, 1);
 
                     if (lobby.players.length === 0) {
