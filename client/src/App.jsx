@@ -6,7 +6,10 @@ import LobbyScreen from './components/LobbyScreen';
 import GameRoom from './components/GameRoom';
 
 const socket = io(import.meta.env.VITE_API_BASE, {
-  transports: ['websocket']
+  transports: ['websocket'],
+  reconnection: true,
+  reconnectionDelay: 1000,
+  reconnectionAttempts: 5
 });
 
 function App() {
@@ -68,6 +71,7 @@ function App() {
 
     return () => {
       socket.off('connect');
+      socket.off('disconnect');
       socket.off('login_success');
       socket.off('lobby_created');
       socket.off('player_joined');
@@ -75,6 +79,7 @@ function App() {
       socket.off('game_over');
       socket.off('game_reset');
       socket.off('play_with_bot');
+      socket.off('player_reconnected');
       socket.off('player_left');
       socket.off('error');
     };
