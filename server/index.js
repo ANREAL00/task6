@@ -15,9 +15,7 @@ const io = new Server(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"]
-  },
-  pingTimeout: 20000,
-  pingInterval: 10000
+  }
 });
 
 socketManager(io);

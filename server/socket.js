@@ -178,13 +178,9 @@ function socketManager(io) {
                 player.id = socket.id;
                 socket.join(roomId);
                 if (lobby.turn !== socket.id) {
-                    // Turn might be tied to old ID, we don't need to manually fix it 
-                    // if turn update logic uses the new ID next time.
-                    // But if it was the player's turn, we should ensure turn matches socket.id
                 }
             }
 
-            // Sync turn if it's the player's turn but the ID hasn't updated yet in the lobby object
             const isMyTurn = (lobby.turn === socket.id) || (player && lobby.turn === player.username);
 
             if (!isMyTurn) return;

@@ -13,12 +13,6 @@ function App() {
   const [lobby, setLobby] = useState(null);
 
   useEffect(() => {
-    socket.on('connect', () => {
-      if (username) {
-        socket.emit('login', username);
-      }
-    });
-
     socket.on('login_success', ({ username }) => {
       setUsername(username);
       setScreen('lobby');
@@ -35,15 +29,15 @@ function App() {
     });
 
     socket.on('update_board', ({ board, turn }) => {
-      setLobby(prev => prev ? { ...prev, board, turn } : null);
+      setLobby(prev => ({ ...prev, board, turn }));
     });
 
     socket.on('game_over', ({ winner, board }) => {
-      setLobby(prev => prev ? { ...prev, board, winner } : null);
+      setLobby(prev => ({ ...prev, board, winner }));
     });
 
     socket.on('rematch_update', ({ rematch }) => {
-      setLobby(prev => prev ? { ...prev, rematch } : null);
+      setLobby(prev => ({ ...prev, rematch }));
     });
 
     socket.on('game_reset', (resetLobby) => {
@@ -94,7 +88,7 @@ function App() {
   };
 
   const handleMove = (roomId, index) => {
-    socket.emit('make_move', { roomId, index, username });
+    socket.emit('make_move', { roomId, index });
   };
 
   const handlePlayAgain = (roomId) => {
