@@ -95,14 +95,17 @@ function handleBotMove(io, roomId) {
 
 function socketManager(io) {
     io.on('connection', (socket) => {
+        console.log(`User connected: ${socket.id} (transport: ${socket.conn.transport.name})`);
 
         socket.on('login', (username) => {
+            console.log(`User login: ${username} (socket: ${socket.id})`);
             socket.username = username;
             socket.emit('login_success', { id: socket.id, username });
         });
 
         socket.on('create_lobby', () => {
             const roomId = uuidv4().slice(0, 6).toUpperCase();
+            console.log(`Creating lobby: ${roomId} by ${socket.username}`);
             const lobby = {
                 id: roomId,
                 players: [{ id: socket.id, username: socket.username, symbol: 'X' }],
@@ -122,6 +125,7 @@ function socketManager(io) {
 
         socket.on('create_lobby_with_bot', () => {
             const roomId = uuidv4().slice(0, 6).toUpperCase();
+            console.log(`Creating bot lobby: ${roomId} by ${socket.username}`);
             const lobby = {
                 id: roomId,
                 players: [
@@ -146,6 +150,7 @@ function socketManager(io) {
             const lobby = lobbies.get(roomId);
 
             if (!lobby) {
+                console.log(`Join failed: Lobby ${roomId} not found for ${socket.username}`);
                 socket.emit('error', 'Lobby not found');
                 return;
             }
@@ -157,6 +162,7 @@ function socketManager(io) {
 
             const player = { id: socket.id, username: socket.username, symbol: 'O' };
             lobby.players.push(player);
+            console.log(`User ${socket.username} joined lobby ${roomId}`);
 
             socket.join(roomId);
 
@@ -164,19 +170,44 @@ function socketManager(io) {
             io.to(roomId).emit('game_start', lobby);
         });
 
-        socket.on('make_move', ({ roomId, index }) => {
+        socket.on('make_move', ({ roomId, index, username }) => {
             const lobby = lobbies.get(roomId);
-            if (!lobby) return;
-            if (lobby.players.length === 1 && !lobby.playWithBot) return;
+            if (!lobby) {
+                console.log(`Move failed: Lobby ${roomId} not found`);
+                return;
+            }
+
+            // Persistence: if username is provided, check if we need to update IDs
+            const currentUsername = socket.username || username;
+            let player = lobby.players.find(p => p.username === currentUsername);
+
+            if (player && player.id !== socket.id) {
+                console.log(`Updating socket ID for player ${currentUsername}: ${player.id} -> ${socket.id}`);
+                player.id = socket.id;
+                socket.join(roomId);
+                socket.username = currentUsername; // ensure current socket is labeled
+            }
 
             if (lobby.winner) return;
-            if (lobby.turn !== socket.id) return;
+
+            // resilient turn check: is it our turn?
+            const isOurTurn = (lobby.turn === socket.id) || (player && lobby.turn === currentUsername);
+
+            if (!isOurTurn) {
+                console.log(`Move ignored: Not turn of ${currentUsername} (Socket: ${socket.id}, Lobby turn: ${lobby.turn})`);
+                return;
+            }
+
             if (lobby.board[index] !== null) return;
 
-            const player = lobby.players.find(p => p.id === socket.id);
-            if (!player) return;
+            if (!player) player = lobby.players.find(p => p.id === socket.id);
+            if (!player) {
+                console.log(`Move failed: Player not found for socket ${socket.id}`);
+                return;
+            }
 
             lobby.board[index] = player.symbol;
+            console.log(`Move by ${player.username} at index ${index}`);
 
             const result = checkWinner(lobby.board);
 
@@ -250,10 +281,16 @@ function socketManager(io) {
             }
         });
 
-        socket.on('disconnect', () => {
+        socket.on('disconnect', (reason) => {
+            console.log(`User disconnected: ${socket.id} (${socket.username || 'guest'}), reason: ${reason}`);
             for (const [roomId, lobby] of lobbies.entries()) {
                 const playerIndex = lobby.players.findIndex(p => p.id === socket.id);
                 if (playerIndex !== -1) {
+                    if (lobby.playWithBot) {
+                        console.log(`Bot game preserved despite disconnect of ${socket.username} from lobby ${roomId}`);
+                        continue;
+                    }
+
                     lobby.players.splice(playerIndex, 1);
 
                     if (lobby.players.length === 0) {

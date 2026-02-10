@@ -5,7 +5,9 @@ import LoginScreen from './components/LoginScreen';
 import LobbyScreen from './components/LobbyScreen';
 import GameRoom from './components/GameRoom';
 
-const socket = io(import.meta.env.VITE_API_BASE);
+const socket = io(import.meta.env.VITE_API_BASE, {
+  transports: ['websocket']
+});
 
 function App() {
   const [screen, setScreen] = useState('login');
@@ -13,6 +15,12 @@ function App() {
   const [lobby, setLobby] = useState(null);
 
   useEffect(() => {
+    socket.on('connect', () => {
+      if (username) {
+        socket.emit('login', username);
+      }
+    });
+
     socket.on('login_success', ({ username }) => {
       setUsername(username);
       setScreen('lobby');
@@ -88,7 +96,7 @@ function App() {
   };
 
   const handleMove = (roomId, index) => {
-    socket.emit('make_move', { roomId, index });
+    socket.emit('make_move', { roomId, index, username });
   };
 
   const handlePlayAgain = (roomId) => {
