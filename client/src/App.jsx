@@ -13,6 +13,12 @@ function App() {
   const [lobby, setLobby] = useState(null);
 
   useEffect(() => {
+    socket.on('connect', () => {
+      if (username) {
+        socket.emit('login', username);
+      }
+    });
+
     socket.on('login_success', ({ username }) => {
       setUsername(username);
       setScreen('lobby');
@@ -88,7 +94,7 @@ function App() {
   };
 
   const handleMove = (roomId, index) => {
-    socket.emit('make_move', { roomId, index });
+    socket.emit('make_move', { roomId, index, username });
   };
 
   const handlePlayAgain = (roomId) => {

@@ -16,8 +16,8 @@ const io = new Server(server, {
     origin: "*",
     methods: ["GET", "POST"]
   },
-  pingTimeout: 30000,
-  pingInterval: 5000
+  pingTimeout: 20000,
+  pingInterval: 10000
 });
 
 socketManager(io);

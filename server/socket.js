@@ -164,26 +164,33 @@ function socketManager(io) {
             io.to(roomId).emit('game_start', lobby);
         });
 
-        socket.on('make_move', ({ roomId, index }) => {
+        socket.on('make_move', ({ roomId, index, username }) => {
             const lobby = lobbies.get(roomId);
             if (!lobby) return;
             if (lobby.players.length === 1 && !lobby.playWithBot) return;
 
             if (lobby.winner) return;
 
-            let player = lobby.players.find(p => p.username === socket.username);
+            const activeUsername = socket.username || username;
+            let player = lobby.players.find(p => p.username === activeUsername);
+
             if (player && player.id !== socket.id) {
                 player.id = socket.id;
                 socket.join(roomId);
-                if (lobby.turn === player.username) {
-                    lobby.turn = socket.id;
+                if (lobby.turn !== socket.id) {
+                    // Turn might be tied to old ID, we don't need to manually fix it 
+                    // if turn update logic uses the new ID next time.
+                    // But if it was the player's turn, we should ensure turn matches socket.id
                 }
             }
 
-            if (lobby.turn !== socket.id) return;
+            // Sync turn if it's the player's turn but the ID hasn't updated yet in the lobby object
+            const isMyTurn = (lobby.turn === socket.id) || (player && lobby.turn === player.username);
+
+            if (!isMyTurn) return;
             if (lobby.board[index] !== null) return;
 
-            player = lobby.players.find(p => p.id === socket.id);
+            if (!player) player = lobby.players.find(p => p.id === socket.id);
             if (!player) return;
 
             lobby.board[index] = player.symbol;
