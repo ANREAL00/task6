@@ -53,7 +53,6 @@ function App() {
     });
 
     socket.on('player_reconnected', (updatedLobby) => {
-      console.log('Player reconnected, syncing lobby state');
       setLobby(updatedLobby);
     });
 
