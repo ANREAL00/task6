@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Swords, Users } from 'lucide-react';
+import { Swords, Users, Bot } from 'lucide-react';
 
-const LobbyScreen = ({ username, onCreateGame, onJoinGame }) => {
+const LobbyScreen = ({ username, onCreateGame, onCreateGameWithBot, onJoinGame }) => {
     const [roomId, setRoomId] = useState('');
 
     const handleJoin = (e) => {
@@ -21,6 +21,9 @@ const LobbyScreen = ({ username, onCreateGame, onJoinGame }) => {
                 <div className="lobby-option">
                     <button onClick={onCreateGame} className="btn-gradient">
                         <Swords size={20} /> Create New Game
+                    </button>
+                    <button onClick={onCreateGameWithBot} className="btn-gradient">
+                        <Bot size={20} /> Play with Bot
                     </button>
                     <p style={{ fontSize: '0.9rem', color: 'var(--color-text-dim)', marginTop: '0.5rem', textAlign: 'center' }}>
                         Start a new game and invite a friend.

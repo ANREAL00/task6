@@ -3,7 +3,7 @@ import { message } from 'antd';
 import Board from './Board';
 import { Copy, RefreshCw, LogOut } from 'lucide-react';
 
-const GameRoom = ({ lobby, username, onMove, onPlayAgain, onLeave }) => {
+const GameRoom = ({ lobby, username, onMove, onPlayAgain, onPlayWithBot, onLeave }) => {
     const isMyTurn = lobby.turn === lobby.players.find(p => p.username === username)?.id;
     const me = lobby.players.find(p => p.username === username);
     const opponent = lobby.players.find(p => p.username !== username);
@@ -53,16 +53,24 @@ const GameRoom = ({ lobby, username, onMove, onPlayAgain, onLeave }) => {
                         }}>
                             {lobby.winner === 'draw' ? "It's a Draw!" : (lobby.winner === me.symbol ? "You Won!" : "You Lost")}
                         </h3>
-                        {lobby.rematch && lobby.rematch.includes(me.id) ? (
+                        {lobby.rematch && !lobby.playWithBot && lobby.rematch.includes(me.id) ? (
                             <p style={{ marginTop: '1rem', color: 'var(--color-primary)', fontWeight: 'bold' }}>
                                 Waiting for opponent's decision...
                             </p>
-                        ) : (
+                        ) : (!lobby.playWithBot &&
                             <button
                                 onClick={() => onPlayAgain(lobby.id)}
                                 style={{ marginTop: '1rem', background: 'var(--color-primary)', display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'white' }}
                             >
                                 <RefreshCw size={18} /> Play Again
+                            </button>
+                        )}
+                        {lobby.playWithBot && (
+                            <button
+                                onClick={() => onPlayWithBot(lobby.id)}
+                                style={{ marginTop: '1rem', background: 'var(--color-primary)', display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'white' }}
+                            >
+                                <Bot size={18} /> Play with Bot
                             </button>
                         )}
                     </div>

@@ -18,6 +18,81 @@ function checkWinner(board) {
     return board.includes(null) ? null : 'draw';
 }
 
+const BOT_ID = 'BOT_PLAYER';
+
+function minimax(board, depth, isMaximizing, botSymbol, playerSymbol) {
+    const winner = checkWinner(board);
+    if (winner === botSymbol) return 10 - depth;
+    if (winner === playerSymbol) return depth - 10;
+    if (winner === 'draw') return 0;
+
+    if (isMaximizing) {
+        let bestScore = -Infinity;
+        for (let i = 0; i < 9; i++) {
+            if (board[i] === null) {
+                board[i] = botSymbol;
+                let score = minimax(board, depth + 1, false, botSymbol, playerSymbol);
+                board[i] = null;
+                bestScore = Math.max(score, bestScore);
+            }
+        }
+        return bestScore;
+    } else {
+        let bestScore = Infinity;
+        for (let i = 0; i < 9; i++) {
+            if (board[i] === null) {
+                board[i] = playerSymbol;
+                let score = minimax(board, depth + 1, true, botSymbol, playerSymbol);
+                board[i] = null;
+                bestScore = Math.min(score, bestScore);
+            }
+        }
+        return bestScore;
+    }
+}
+
+function getBestMove(board, botSymbol, playerSymbol) {
+    let bestScore = -Infinity;
+    let move = -1;
+    for (let i = 0; i < 9; i++) {
+        if (board[i] === null) {
+            board[i] = botSymbol;
+            let score = minimax(board, 0, false, botSymbol, playerSymbol);
+            board[i] = null;
+            if (score > bestScore) {
+                bestScore = score;
+                move = i;
+            }
+        }
+    }
+    return move;
+}
+
+function handleBotMove(io, roomId) {
+    const lobby = lobbies.get(roomId);
+    if (!lobby || lobby.winner || lobby.turn !== BOT_ID) return;
+
+    setTimeout(() => {
+        const botPlayer = lobby.players.find(p => p.id === BOT_ID);
+        const humanPlayer = lobby.players.find(p => p.id !== BOT_ID);
+        if (!botPlayer || !humanPlayer) return;
+
+        const bestMove = getBestMove(lobby.board, botPlayer.symbol, humanPlayer.symbol);
+        if (bestMove === -1) return;
+
+        lobby.board[bestMove] = botPlayer.symbol;
+        const result = checkWinner(lobby.board);
+
+        if (result) {
+            lobby.winner = result;
+            io.to(roomId).emit('game_over', { winner: result, board: lobby.board });
+        } else {
+            lobby.turn = humanPlayer.id;
+            io.to(roomId).emit('update_board', { board: lobby.board, turn: lobby.turn });
+        }
+    }, 600);
+}
+
 function socketManager(io) {
     io.on('connection', (socket) => {
 
@@ -35,7 +110,30 @@ function socketManager(io) {
                 turn: socket.id,
                 firstTurn: socket.id,
                 winner: null,
-                rematch: []
+                rematch: [],
+                playWithBot: false
+            };
+
+            lobbies.set(roomId, lobby);
+            socket.join(roomId);
+
+            socket.emit('lobby_created', lobby);
+        });
+
+        socket.on('create_lobby_with_bot', () => {
+            const roomId = uuidv4().slice(0, 6).toUpperCase();
+            const lobby = {
+                id: roomId,
+                players: [
+                    { id: socket.id, username: socket.username, symbol: 'X' },
+                    { id: BOT_ID, username: 'Bot', symbol: 'O' }
+                ],
+                board: Array(9).fill(null),
+                turn: socket.id,
+                firstTurn: socket.id,
+                winner: null,
+                rematch: [],
+                playWithBot: true
             };
 
             lobbies.set(roomId, lobby);
@@ -69,7 +167,7 @@ function socketManager(io) {
         socket.on('make_move', ({ roomId, index }) => {
             const lobby = lobbies.get(roomId);
             if (!lobby) return;
-            if (lobby.players.length === 1) return;
+            if (lobby.players.length === 1 && !lobby.playWithBot) return;
 
             if (lobby.winner) return;
             if (lobby.turn !== socket.id) return;
@@ -89,6 +187,10 @@ function socketManager(io) {
                 const nextPlayer = lobby.players.find(p => p.id !== socket.id);
                 lobby.turn = nextPlayer ? nextPlayer.id : null;
                 io.to(roomId).emit('update_board', { board: lobby.board, turn: lobby.turn });
+
+                if (lobby.playWithBot && lobby.turn === BOT_ID) {
+                    handleBotMove(io, roomId);
+                }
             }
         });
 
@@ -105,11 +207,29 @@ function socketManager(io) {
                 lobby.rematch = [];
                 lobby.firstTurn = lobby.firstTurn === lobby.players[0].id ? lobby.players[1].id : lobby.players[0].id;
                 lobby.turn = lobby.firstTurn;
+                lobby.playWithBot = false;
 
                 io.to(roomId).emit('game_reset', lobby);
             } else {
                 io.to(roomId).emit('rematch_update', { rematch: lobby.rematch });
             }
+        });
+
+        socket.on('play_with_bot', (roomId) => {
+            const lobby = lobbies.get(roomId);
+            if (!lobby) return;
+
+            lobby.players = [
+                { id: socket.id, username: socket.username, symbol: 'X' },
+                { id: BOT_ID, username: 'Bot', symbol: 'O' }
+            ];
+            lobby.board = Array(9).fill(null);
+            lobby.winner = null;
+            lobby.turn = socket.id;
+            lobby.firstTurn = socket.id;
+            lobby.playWithBot = true;
+
+            io.to(roomId).emit('game_reset', lobby);
         });
 
         socket.on('leave_lobby', (roomId) => {

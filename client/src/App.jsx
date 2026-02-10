@@ -61,6 +61,7 @@ function App() {
       socket.off('update_board');
       socket.off('game_over');
       socket.off('game_reset');
+      socket.off('play_with_bot');
       socket.off('player_left');
       socket.off('error');
     };
@@ -74,8 +75,16 @@ function App() {
     socket.emit('create_lobby');
   };
 
+  const handleCreateGameWithBot = () => {
+    socket.emit('create_lobby_with_bot');
+  };
+
   const handleJoinGame = (roomId) => {
     socket.emit('join_lobby', roomId);
+  };
+
+  const handlePlayWithBot = (roomId) => {
+    socket.emit('play_with_bot', roomId);
   };
 
   const handleMove = (roomId, index) => {
@@ -101,6 +110,7 @@ function App() {
           username={username}
           onCreateGame={handleCreateGame}
           onJoinGame={handleJoinGame}
+          onPlayWithBot={handleCreateGameWithBot}
         />
       )}
 
@@ -110,6 +120,7 @@ function App() {
           username={username}
           onMove={handleMove}
           onPlayAgain={handlePlayAgain}
+          onPlayWithBot={handlePlayWithBot}
           onLeave={handleLeave}
         />
       )}
