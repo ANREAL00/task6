@@ -1,7 +1,7 @@
 import React from 'react';
 import { message } from 'antd';
 import Board from './Board';
-import { Copy, RefreshCw, LogOut } from 'lucide-react';
+import { Copy, RefreshCw, LogOut, Bot } from 'lucide-react';
 
 const GameRoom = ({ lobby, username, onMove, onPlayAgain, onPlayWithBot, onLeave }) => {
     const isMyTurn = lobby.turn === lobby.players.find(p => p.username === username)?.id;

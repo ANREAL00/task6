@@ -225,6 +225,7 @@ function socketManager(io) {
             ];
             lobby.board = Array(9).fill(null);
             lobby.winner = null;
+            lobby.rematch = [];
             lobby.turn = socket.id;
             lobby.firstTurn = socket.id;
             lobby.playWithBot = true;
