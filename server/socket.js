@@ -183,9 +183,16 @@ function socketManager(io) {
 
             if (player && player.id !== socket.id) {
                 console.log(`Updating socket ID for player ${currentUsername}: ${player.id} -> ${socket.id}`);
+                const oldId = player.id;
                 player.id = socket.id;
                 socket.join(roomId);
                 socket.username = currentUsername; // ensure current socket is labeled
+
+                // CRITICAL: Update turn if it was pointing to the old ID
+                if (lobby.turn === oldId) {
+                    lobby.turn = socket.id;
+                    console.log(`Updated lobby turn from ${oldId} to ${socket.id}`);
+                }
             }
 
             if (lobby.winner) return;
