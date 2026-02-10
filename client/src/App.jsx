@@ -63,6 +63,7 @@ function App() {
     });
 
     return () => {
+      socket.off('connect');
       socket.off('login_success');
       socket.off('lobby_created');
       socket.off('player_joined');
@@ -73,7 +74,7 @@ function App() {
       socket.off('player_left');
       socket.off('error');
     };
-  }, [screen]);
+  }, []);
 
   const handleLogin = (name) => {
     socket.emit('login', name);

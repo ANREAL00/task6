@@ -16,7 +16,8 @@ const io = new Server(server, {
     origin: "*",
     methods: ["GET", "POST"]
   },
-  transports: ['websocket']
+  transports: ['websocket'],
+  pingTimeout: 60000
 });
 
 socketManager(io);
