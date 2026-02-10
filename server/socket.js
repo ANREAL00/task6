@@ -193,6 +193,9 @@ function socketManager(io) {
                     lobby.turn = socket.id;
                     console.log(`Updated lobby turn from ${oldId} to ${socket.id}`);
                 }
+
+                // Send full lobby state to all players to sync after reconnection
+                io.to(roomId).emit('player_reconnected', lobby);
             }
 
             if (lobby.winner) return;

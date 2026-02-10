@@ -52,6 +52,11 @@ function App() {
       setLobby(resetLobby);
     });
 
+    socket.on('player_reconnected', (updatedLobby) => {
+      console.log('Player reconnected, syncing lobby state');
+      setLobby(updatedLobby);
+    });
+
     socket.on('player_left', () => {
       message.info('Opponent disconnected.');
       setScreen('lobby');
