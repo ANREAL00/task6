@@ -164,29 +164,16 @@ function socketManager(io) {
             io.to(roomId).emit('game_start', lobby);
         });
 
-        socket.on('make_move', ({ roomId, index, username }) => {
+        socket.on('make_move', ({ roomId, index }) => {
             const lobby = lobbies.get(roomId);
             if (!lobby) return;
             if (lobby.players.length === 1 && !lobby.playWithBot) return;
 
             if (lobby.winner) return;
-
-            const activeUsername = socket.username || username;
-            let player = lobby.players.find(p => p.username === activeUsername);
-
-            if (player && player.id !== socket.id) {
-                player.id = socket.id;
-                socket.join(roomId);
-                if (lobby.turn !== socket.id) {
-                }
-            }
-
-            const isMyTurn = (lobby.turn === socket.id) || (player && lobby.turn === player.username);
-
-            if (!isMyTurn) return;
+            if (lobby.turn !== socket.id) return;
             if (lobby.board[index] !== null) return;
 
-            if (!player) player = lobby.players.find(p => p.id === socket.id);
+            const player = lobby.players.find(p => p.id === socket.id);
             if (!player) return;
 
             lobby.board[index] = player.symbol;
@@ -267,10 +254,6 @@ function socketManager(io) {
             for (const [roomId, lobby] of lobbies.entries()) {
                 const playerIndex = lobby.players.findIndex(p => p.id === socket.id);
                 if (playerIndex !== -1) {
-                    if (lobby.playWithBot) {
-                        continue;
-                    }
-
                     lobby.players.splice(playerIndex, 1);
 
                     if (lobby.players.length === 0) {
