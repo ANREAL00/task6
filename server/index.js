@@ -17,7 +17,10 @@ const io = new Server(server, {
     methods: ["GET", "POST"]
   },
   transports: ['websocket'],
-  pingTimeout: 60000
+  pingTimeout: 60000,
+  reconnect: true,
+  reconnectionDelay: 1000,
+  reconnectionAttempts: 5
 });
 
 socketManager(io);
