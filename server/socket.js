@@ -40,7 +40,7 @@ function minimax(board, depth, isMaximizing, botSymbol, playerSymbol) {
                 }
             }
         }
-        return Math.random() > 0.5 ? bestScore : prevBestScore;
+        return Math.random() > 0.9 ? bestScore : prevBestScore;
     } else {
         let bestScore = Infinity;
         let prevBestScore = bestScore;
@@ -55,7 +55,7 @@ function minimax(board, depth, isMaximizing, botSymbol, playerSymbol) {
                 }
             }
         }
-        return Math.random() > 0.5 ? bestScore : prevBestScore;
+        return Math.random() > 0.9 ? bestScore : prevBestScore;
     }
 }
 
