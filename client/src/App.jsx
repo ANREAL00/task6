@@ -3,7 +3,8 @@ import io from 'socket.io-client';
 import { message } from 'antd';
 import LoginScreen from './components/LoginScreen';
 import LobbyScreen from './components/LobbyScreen';
-import GameRoom from './components/GameRoom';
+import TicTacToeGameRoom from './components/TicTacToeGameRoom';
+import RockPaperScissorsGameRoom from './components/RockPaperScissorsGameRoom';
 
 const socket = io(import.meta.env.VITE_API_BASE || 'http://localhost:3001', {
   transports: ['websocket'],
@@ -103,6 +104,10 @@ function App() {
     socket.emit('create_tic_tac_toe_lobby');
   };
 
+  const handleCreateGameRPS = () => {
+    socket.emit('create_rock_paper_scissors_lobby');
+  };
+
   const handleCreateGameWithBot = () => {
     socket.emit('create_lobby_with_bot');
   };
@@ -115,8 +120,12 @@ function App() {
     socket.emit('play_with_bot', roomId);
   };
 
-  const handleMove = (roomId, index) => {
+  const handleTicTacToeMove = (roomId, index) => {
     socket.emit('make_move', { roomId, index, username });
+  };
+
+  const handleRockPaperScissorsMove = (roomId, index) => {
+    socket.emit('make_rock_paper_scissors_move', { roomId, index, username });
   };
 
   const handlePlayAgain = (roomId) => {
@@ -137,16 +146,17 @@ function App() {
         <LobbyScreen
           username={username}
           onCreateGame={handleCreateGameTicTacToe}
+          onCreateGameRPS={handleCreateGameRPS}
           onJoinGame={handleJoinGameTicTacToe}
           onCreateGameWithBot={handleCreateGameWithBot}
         />
       )}
 
       {screen === 'game_tic_tac_toe' && lobby && (
-        <GameRoom
+        <TicTacToeGameRoom
           lobby={lobby}
           username={username}
-          onMove={handleMove}
+          onMove={handleTicTacToeMove}
           onPlayAgain={handlePlayAgain}
           onPlayWithBot={handlePlayWithBot}
           onLeave={handleLeave}
@@ -154,12 +164,11 @@ function App() {
       )}
 
       {screen === 'game_rock_paper_scissors' && lobby && (
-        <GameRoom
+        <RockPaperScissorsGameRoom
           lobby={lobby}
           username={username}
-          onMove={handleMove}
+          onMove={handleRockPaperScissorsMove}
           onPlayAgain={handlePlayAgain}
-          onPlayWithBot={handlePlayWithBot}
           onLeave={handleLeave}
         />
       )}

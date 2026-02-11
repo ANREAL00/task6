@@ -328,6 +328,11 @@ input:focus {
   transition: all 0.2s;
 }
 
+.square.loader {
+  --square-size: 150px;
+  margin-bottom: 1rem;
+}
+
 @media (max-width: 768px) {
   #root {
     padding: 1rem;

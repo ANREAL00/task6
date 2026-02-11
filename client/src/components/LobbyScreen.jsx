@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Swords, Users, Bot } from 'lucide-react';
 
-const LobbyScreen = ({ username, onCreateGame, onCreateGameWithBot, onJoinGame }) => {
+const LobbyScreen = ({ username, onCreateGame, onCreateGameRPS, onCreateGameWithBot, onJoinGame }) => {
     const [roomId, setRoomId] = useState('');
 
     const handleJoin = (e) => {
@@ -36,7 +36,7 @@ const LobbyScreen = ({ username, onCreateGame, onCreateGameWithBot, onJoinGame }
                     </div>
                     <div className="lobby-option">
                         <h1 className="lobby-option-title">Rock Paper Scissors</h1>
-                        <button onClick={onCreateGame} className="btn-gradient">
+                        <button onClick={onCreateGameRPS} className="btn-gradient">
                             <Swords size={20} /> Create New Game
                         </button>
                         <p className="lobby-option-text">

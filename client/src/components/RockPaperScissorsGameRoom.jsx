@@ -1,9 +1,9 @@
 import React from 'react';
 import { message } from 'antd';
-import Board from './Board';
-import { Copy, RefreshCw, LogOut, Bot } from 'lucide-react';
+import RockPaperScissorsPanel from './RockPaperScissorsPanel';
+import { Copy, RefreshCw, LogOut } from 'lucide-react';
 
-const GameRoom = ({ lobby, username, onMove, onPlayAgain, onPlayWithBot, onLeave }) => {
+const RockPaperScissorsGameRoom = ({ lobby, username, onMove, onPlayAgain, onLeave }) => {
     const isMyTurn = lobby.turn === lobby.players.find(p => p.username === username)?.id;
     const me = lobby.players.find(p => p.username === username);
     const opponent = lobby.players.find(p => p.username !== username);
@@ -38,11 +38,9 @@ const GameRoom = ({ lobby, username, onMove, onPlayAgain, onPlayWithBot, onLeave
             </div>
 
             <div style={{ margin: '0 auto' }}>
-                <Board
+                <RockPaperScissorsPanel
                     board={lobby.board}
                     onMove={(index) => onMove(lobby.id, index)}
-                    myTurn={isMyTurn}
-                    winner={lobby.winner}
                 />
             </div>
 
@@ -122,4 +120,4 @@ const PlayerBadge = ({ player, isTurn, label }) => {
     );
 };
 
-export default GameRoom;
+export default RockPaperScissorsGameRoom;

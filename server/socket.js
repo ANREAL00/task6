@@ -128,6 +128,23 @@ function socketManager(io) {
             socket.emit('lobby_tic_tac_toe_created', lobby);
         });
 
+        socket.on('create_rock_paper_scissors_lobby', () => {
+            const roomId = uuidv4().slice(0, 6).toUpperCase();
+            const lobby = {
+                id: roomId,
+                players: [{ id: socket.id, username: socket.username }],
+                board: Array(3).fill(null),
+                ready: false,
+                winner: null,
+                rematch: []
+            };
+
+            lobbies.set(roomId, lobby);
+            socket.join(roomId);
+
+            socket.emit('lobby_rock_paper_scissors_created', lobby);
+        });
+
         socket.on('create_lobby_with_bot', () => {
             const roomId = uuidv4().slice(0, 6).toUpperCase();
             const lobby = {
