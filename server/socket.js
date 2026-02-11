@@ -28,26 +28,34 @@ function minimax(board, depth, isMaximizing, botSymbol, playerSymbol) {
 
     if (isMaximizing) {
         let bestScore = -Infinity;
+        let prevBestScore = bestScore;
         for (let i = 0; i < 9; i++) {
             if (board[i] === null) {
                 board[i] = botSymbol;
                 let score = minimax(board, depth + 1, false, botSymbol, playerSymbol);
                 board[i] = null;
                 bestScore = Math.max(score, bestScore);
+                if (prevBestScore === bestScore) {
+                    prevBestScore = score;
+                }
             }
         }
-        return Math.random() > 0.5 ? bestScore : bestScore + 1;
+        return Math.random() > 0.5 ? bestScore : prevBestScore;
     } else {
         let bestScore = Infinity;
+        let prevBestScore = bestScore;
         for (let i = 0; i < 9; i++) {
             if (board[i] === null) {
                 board[i] = playerSymbol;
                 let score = minimax(board, depth + 1, true, botSymbol, playerSymbol);
                 board[i] = null;
                 bestScore = Math.min(score, bestScore);
+                if (prevBestScore === bestScore) {
+                    prevBestScore = score;
+                }
             }
         }
-        return Math.random() > 0.5 ? bestScore : bestScore - 1;
+        return Math.random() > 0.5 ? bestScore : prevBestScore;
     }
 }
 
