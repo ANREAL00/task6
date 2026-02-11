@@ -167,6 +167,7 @@ function socketManager(io) {
         socket.on('make_move', ({ roomId, index, username }) => {
             const lobby = lobbies.get(roomId);
             if (!lobby) return;
+            if (lobby.players.length < 2) return;
 
             const currentUsername = socket.username || username;
             let player = lobby.players.find(p => p.username === currentUsername);
