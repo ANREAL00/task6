@@ -36,7 +36,7 @@ function minimax(board, depth, isMaximizing, botSymbol, playerSymbol) {
                 bestScore = Math.max(score, bestScore);
             }
         }
-        return bestScore;
+        return Math.random() > 0.5 ? bestScore : bestScore + 1;
     } else {
         let bestScore = Infinity;
         for (let i = 0; i < 9; i++) {
@@ -47,7 +47,7 @@ function minimax(board, depth, isMaximizing, botSymbol, playerSymbol) {
                 bestScore = Math.min(score, bestScore);
             }
         }
-        return bestScore;
+        return Math.random() > 0.5 ? bestScore : bestScore - 1;
     }
 }
 
