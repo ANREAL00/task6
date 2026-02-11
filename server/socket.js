@@ -109,7 +109,7 @@ function socketManager(io) {
             socket.emit('login_success', { id: socket.id, username });
         });
 
-        socket.on('create_lobby', () => {
+        socket.on('create_tic_tac_toe_lobby', () => {
             const roomId = uuidv4().slice(0, 6).toUpperCase();
             const lobby = {
                 id: roomId,
@@ -125,7 +125,7 @@ function socketManager(io) {
             lobbies.set(roomId, lobby);
             socket.join(roomId);
 
-            socket.emit('lobby_created', lobby);
+            socket.emit('lobby_tic_tac_toe_created', lobby);
         });
 
         socket.on('create_lobby_with_bot', () => {
@@ -147,10 +147,10 @@ function socketManager(io) {
             lobbies.set(roomId, lobby);
             socket.join(roomId);
 
-            socket.emit('lobby_created', lobby);
+            socket.emit('lobby_tic_tac_toe_created', lobby);
         });
 
-        socket.on('join_lobby', (roomId) => {
+        socket.on('join_tic_tac_toe_lobby', (roomId) => {
             const lobby = lobbies.get(roomId);
 
             if (!lobby) {
@@ -168,8 +168,8 @@ function socketManager(io) {
 
             socket.join(roomId);
 
-            io.to(roomId).emit('player_joined', lobby);
-            io.to(roomId).emit('game_start', lobby);
+            io.to(roomId).emit('player_joined_tic_tac_toe', lobby);
+            io.to(roomId).emit('game_start_tic_tac_toe', lobby);
         });
 
         socket.on('make_move', ({ roomId, index, username }) => {

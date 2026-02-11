@@ -5,7 +5,7 @@ import LoginScreen from './components/LoginScreen';
 import LobbyScreen from './components/LobbyScreen';
 import GameRoom from './components/GameRoom';
 
-const socket = io(import.meta.env.VITE_API_BASE, {
+const socket = io(import.meta.env.VITE_API_BASE || 'http://localhost:3001', {
   transports: ['websocket'],
   reconnection: true,
   reconnectionDelay: 1000,
@@ -29,14 +29,24 @@ function App() {
       setScreen('lobby');
     });
 
-    socket.on('lobby_created', (newLobby) => {
+    socket.on('lobby_tic_tac_toe_created', (newLobby) => {
       setLobby(newLobby);
-      setScreen('game');
+      setScreen('game_tic_tac_toe');
     });
 
-    socket.on('player_joined', (updatedLobby) => {
+    socket.on('lobby_rock_paper_scissors_created', (newLobby) => {
+      setLobby(newLobby);
+      setScreen('game_rock_paper_scissors');
+    });
+
+    socket.on('player_joined_tic_tac_toe', (updatedLobby) => {
       setLobby(updatedLobby);
-      if (screen !== 'game') setScreen('game');
+      if (screen !== 'game_tic_tac_toe') setScreen('game_tic_tac_toe');
+    });
+
+    socket.on('player_joined_rock_paper_scissors', (updatedLobby) => {
+      setLobby(updatedLobby);
+      if (screen !== 'game_rock_paper_scissors') setScreen('game_rock_paper_scissors');
     });
 
     socket.on('update_board', ({ board, turn }) => {
@@ -89,16 +99,16 @@ function App() {
     socket.emit('login', name);
   };
 
-  const handleCreateGame = () => {
-    socket.emit('create_lobby');
+  const handleCreateGameTicTacToe = () => {
+    socket.emit('create_tic_tac_toe_lobby');
   };
 
   const handleCreateGameWithBot = () => {
     socket.emit('create_lobby_with_bot');
   };
 
-  const handleJoinGame = (roomId) => {
-    socket.emit('join_lobby', roomId);
+  const handleJoinGameTicTacToe = (roomId) => {
+    socket.emit('join_tic_tac_toe_lobby', roomId);
   };
 
   const handlePlayWithBot = (roomId) => {
@@ -126,13 +136,24 @@ function App() {
       {screen === 'lobby' && (
         <LobbyScreen
           username={username}
-          onCreateGame={handleCreateGame}
-          onJoinGame={handleJoinGame}
+          onCreateGame={handleCreateGameTicTacToe}
+          onJoinGame={handleJoinGameTicTacToe}
           onCreateGameWithBot={handleCreateGameWithBot}
         />
       )}
 
-      {screen === 'game' && lobby && (
+      {screen === 'game_tic_tac_toe' && lobby && (
+        <GameRoom
+          lobby={lobby}
+          username={username}
+          onMove={handleMove}
+          onPlayAgain={handlePlayAgain}
+          onPlayWithBot={handlePlayWithBot}
+          onLeave={handleLeave}
+        />
+      )}
+
+      {screen === 'game_rock_paper_scissors' && lobby && (
         <GameRoom
           lobby={lobby}
           username={username}

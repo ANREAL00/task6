@@ -13,7 +13,7 @@ const LoginScreen = ({ onLogin }) => {
 
     return (
         <div className="card">
-            <h1 className="title">Tic Tac Toe</h1>
+            <h1 className="title">Welcome</h1>
             <p style={{ color: 'var(--color-text-dim)' }}>Enter your name to start</p>
 
             <form onSubmit={handleSubmit} className="form-group">

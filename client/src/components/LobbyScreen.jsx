@@ -18,22 +18,31 @@ const LobbyScreen = ({ username, onCreateGame, onCreateGameWithBot, onJoinGame }
 
             <div className="form-group" style={{ marginTop: '1rem' }}>
 
-                <div className="lobby-option">
-                    <button onClick={onCreateGame} className="btn-gradient">
-                        <Swords size={20} /> Create New Game
-                    </button>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--color-text-dim)', marginTop: '0.5rem', textAlign: 'center' }}>
-                        Start a new game and invite a friend.
-                    </p>
-                </div>
-
-                <div className="lobby-option">
-                    <button onClick={onCreateGameWithBot} className="btn-gradient">
-                        <Bot size={20} /> Play with Bot
-                    </button>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--color-text-dim)', marginTop: '0.5rem', textAlign: 'center' }}>
-                        Play against the Bot.
-                    </p>
+                <div className="lobby-options-container">
+                    <div className="lobby-option">
+                        <h1 className="lobby-option-title">Tic Tac Toe</h1>
+                        <button onClick={onCreateGame} className="btn-gradient">
+                            <Swords size={20} /> Create New Game
+                        </button>
+                        <p className="lobby-option-text" style={{ marginBottom: '1rem' }}>
+                            Start a new game and invite a friend.
+                        </p>
+                        <button onClick={onCreateGameWithBot} className="btn-gradient">
+                            <Bot size={20} /> Play with Bot
+                        </button>
+                        <p className="lobby-option-text">
+                            Play against the Bot.
+                        </p>
+                    </div>
+                    <div className="lobby-option">
+                        <h1 className="lobby-option-title">Rock Paper Scissors</h1>
+                        <button onClick={onCreateGame} className="btn-gradient">
+                            <Swords size={20} /> Create New Game
+                        </button>
+                        <p className="lobby-option-text">
+                            Start a new game and invite a friend.
+                        </p>
+                    </div>
                 </div>
 
                 <div className="divider">
