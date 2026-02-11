@@ -18,16 +18,18 @@ const GameRoom = ({ lobby, username, onMove, onPlayAgain, onPlayWithBot, onLeave
     return (
         <div className="card game-card">
 
-            <div className="room-header">
-                <h2 style={{ margin: 0, fontSize: '1.5rem' }}>Room: <span className="room-id">{lobby.id}</span></h2>
-                <button
-                    onClick={copyRoomId}
-                    className="copy-btn"
-                    title="Copy Room ID"
-                >
-                    <Copy size={16} />
-                </button>
-            </div>
+            {!lobby.playWithBot && (
+                <div className="room-header">
+                    <h2 style={{ margin: 0, fontSize: '1.5rem' }}>Room: <span className="room-id">{lobby.id}</span></h2>
+                    <button
+                        onClick={copyRoomId}
+                        className="copy-btn"
+                        title="Copy Room ID"
+                    >
+                        <Copy size={16} />
+                    </button>
+                </div>
+            )}
 
             <div className="players-container">
                 <PlayerBadge player={me} isTurn={lobby.turn === me.id} label='YOU' />
