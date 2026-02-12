@@ -260,11 +260,11 @@ function socketManager(io) {
 
             if (result) {
                 lobby.winner = result;
-                io.to(roomId).emit('game_over', { winner: result, board: lobby.board });
+                io.to(roomId).emit('game_over', { winner: result, board: lobby.board, players: lobby.players });
             } else {
                 const nextPlayer = lobby.players.find(p => p.id !== socket.id);
                 lobby.turn = nextPlayer ? nextPlayer.id : null;
-                io.to(roomId).emit('update_board', { board: lobby.board, turn: lobby.turn });
+                io.to(roomId).emit('update_board', { board: lobby.board, turn: lobby.turn, players: lobby.players });
 
                 if (lobby.playWithBot && lobby.turn === BOT_ID) {
                     handleBotMove(io, roomId);
@@ -333,7 +333,7 @@ function socketManager(io) {
             }
         });
 
-        socket.on('play_again', (roomId, type) => {
+        socket.on('play_again', (roomId) => {
             const lobby = lobbies.get(roomId);
             if (!lobby) return;
             if (lobby.rematch.includes(socket.id)) return;

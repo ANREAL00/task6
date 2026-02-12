@@ -61,7 +61,7 @@ const TicTacToeGameRoom = ({ lobby, username, onMove, onPlayAgain, onPlayWithBot
                             </p>
                         ) : (!lobby.playWithBot &&
                             <button
-                                onClick={() => onPlayAgain(lobby.id, lobby.type)}
+                                onClick={() => onPlayAgain(lobby.id)}
                                 style={{ marginTop: '1rem', background: 'var(--color-primary)', display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'white' }}
                             >
                                 <RefreshCw size={18} /> Play Again
