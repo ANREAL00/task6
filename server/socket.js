@@ -8,6 +8,8 @@ const WIN_COMBINATIONS = [
     [0, 4, 8], [2, 4, 6]
 ];
 
+const TURN_RPS = ['rock', 'scissors', 'paper'];
+
 function checkWinner(board) {
     for (let combo of WIN_COMBINATIONS) {
         const [a, b, c] = combo;
@@ -16,6 +18,14 @@ function checkWinner(board) {
         }
     }
     return board.includes(null) ? null : 'draw';
+}
+
+function checkWinnerRPS(player1, player2) {
+    if (player1 === player2) return 'draw';
+    if (player1 === 'rock' && player2 === 'scissors') return 'player1';
+    if (player1 === 'paper' && player2 === 'rock') return 'player1';
+    if (player1 === 'scissors' && player2 === 'paper') return 'player1';
+    return 'player2';
 }
 
 const BOT_ID = 'BOT_PLAYER';
@@ -113,6 +123,7 @@ function socketManager(io) {
             const roomId = uuidv4().slice(0, 6).toUpperCase();
             const lobby = {
                 id: roomId,
+                type: 'tic_tac_toe',
                 players: [{ id: socket.id, username: socket.username, symbol: 'X' }],
                 board: Array(9).fill(null),
                 turn: socket.id,
@@ -132,7 +143,8 @@ function socketManager(io) {
             const roomId = uuidv4().slice(0, 6).toUpperCase();
             const lobby = {
                 id: roomId,
-                players: [{ id: socket.id, username: socket.username }],
+                type: 'rock_paper_scissors',
+                players: [{ id: socket.id, username: socket.username, ready: false, turn: null }],
                 board: Array(3).fill(null),
                 ready: false,
                 winner: null,
@@ -167,7 +179,7 @@ function socketManager(io) {
             socket.emit('lobby_tic_tac_toe_created', lobby);
         });
 
-        socket.on('join_tic_tac_toe_lobby', (roomId) => {
+        socket.on('join_lobby', (roomId) => {
             const lobby = lobbies.get(roomId);
 
             if (!lobby) {
@@ -179,17 +191,27 @@ function socketManager(io) {
                 socket.emit('error', 'Lobby is full');
                 return;
             }
-
-            const player = { id: socket.id, username: socket.username, symbol: 'O' };
-            lobby.players.push(player);
+            if (lobby.type === 'rock_paper_scissors') {
+                const player = { id: socket.id, username: socket.username, ready: false, turn: null };
+                lobby.players.push(player);
+            }
+            else {
+                const player = { id: socket.id, username: socket.username, symbol: 'O' };
+                lobby.players.push(player);
+            }
 
             socket.join(roomId);
 
-            io.to(roomId).emit('player_joined_tic_tac_toe', lobby);
-            io.to(roomId).emit('game_start_tic_tac_toe', lobby);
+            if (lobby.type === 'tic_tac_toe') {
+                io.to(roomId).emit('player_joined_tic_tac_toe', lobby);
+                io.to(roomId).emit('game_start_tic_tac_toe', lobby);
+            } else if (lobby.type === 'rock_paper_scissors') {
+                io.to(roomId).emit('player_joined_rock_paper_scissors', lobby);
+                io.to(roomId).emit('game_start_rock_paper_scissors', lobby);
+            }
         });
 
-        socket.on('make_move', ({ roomId, index, username }) => {
+        socket.on('make_move_tictactoe', ({ roomId, index, username }) => {
             const lobby = lobbies.get(roomId);
             if (!lobby) return;
             if (lobby.players.length < 2) return;
@@ -250,14 +272,75 @@ function socketManager(io) {
             }
         });
 
-        socket.on('play_again', (roomId) => {
+        socket.on('make_rock_paper_scissors_move', ({ roomId, index, username }) => {
+            const lobby = lobbies.get(roomId);
+            if (!lobby) return;
+            if (lobby.players.length < 2) return;
+
+            const currentUsername = socket.username || username;
+            let player = lobby.players.find(p => p.username === currentUsername);
+
+            if (player && player.id !== socket.id) {
+                const oldId = player.id;
+                player.id = socket.id;
+                socket.join(roomId);
+                socket.username = currentUsername;
+
+                if (lobby.turn === oldId) {
+                    lobby.turn = socket.id;
+                }
+
+                const otherPlayer = lobby.players.find(p => p.username !== currentUsername);
+                if (otherPlayer && lobby.turn !== socket.id && lobby.turn !== otherPlayer.id && lobby.turn !== BOT_ID) {
+                    const moveCount = lobby.board.filter(cell => cell !== null).length;
+                    const firstPlayerSymbol = lobby.players[0].symbol;
+                    const currentMoveSymbol = moveCount % 2 === 0 ? firstPlayerSymbol : (firstPlayerSymbol === 'X' ? 'O' : 'X');
+                    const playerWithTurn = lobby.players.find(p => p.symbol === currentMoveSymbol);
+                    if (playerWithTurn) {
+                        lobby.turn = playerWithTurn.id;
+                    }
+                }
+
+                io.to(roomId).emit('player_reconnected', lobby);
+            }
+
+            if (lobby.winner) return;
+
+            if (!player) player = lobby.players.find(p => p.id === socket.id);
+            if (!player) return;
+
+            const isOurTurn = (player.ready === false);
+
+            if (!isOurTurn) return;
+
+            player.ready = true;
+            player.turn = TURN_RPS[index];
+
+            if (lobby.players.every(p => p.ready)) {
+                let result = checkWinnerRPS(lobby.players[0].turn, lobby.players[1].turn);
+                if (result === 'player1') {
+                    result = lobby.players[0].username;
+                } else if (result === 'player2') {
+                    result = lobby.players[1].username;
+                } else {
+                    result = 'draw';
+                }
+                lobby.winner = result;
+                console.log(lobby.winner);
+                io.to(roomId).emit('game_over', { winner: result, board: lobby.board, players: lobby.players });
+            } else {
+                io.to(roomId).emit('update_board', { board: lobby.board, turn: lobby.turn, players: lobby.players });
+            }
+        });
+
+        socket.on('play_again', (roomId, type) => {
             const lobby = lobbies.get(roomId);
             if (!lobby) return;
             if (lobby.rematch.includes(socket.id)) return;
 
             lobby.rematch.push(socket.id);
 
-            if (lobby.rematch.length === 2) {
+            if (lobby.rematch.length === 2 && lobby.type === 'tic_tac_toe') {
                 lobby.board = Array(9).fill(null);
                 lobby.winner = null;
                 lobby.rematch = [];
@@ -266,7 +349,17 @@ function socketManager(io) {
                 lobby.playWithBot = false;
 
                 io.to(roomId).emit('game_reset', lobby);
-            } else {
+            } else if (lobby.rematch.length === 2 && lobby.type === 'rock_paper_scissors') {
+                lobby.board = Array(3).fill(null);
+                lobby.winner = null;
+                lobby.rematch = [];
+                lobby.players[0].ready = false;
+                lobby.players[1].ready = false;
+                lobby.players[0].turn = null;
+                lobby.players[1].turn = null;
+                io.to(roomId).emit('game_reset', lobby);
+            }
+            else {
                 io.to(roomId).emit('rematch_update', { rematch: lobby.rematch });
             }
         });

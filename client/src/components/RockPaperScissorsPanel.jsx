@@ -1,20 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mountain, Newspaper, Scissors, Loader } from 'lucide-react';
+import { Mountain, Newspaper, Scissors } from 'lucide-react';
 
-const RockPaperScissorsPanel = ({ board, onMove }) => {
+const RockPaperScissorsPanel = ({ board, onMove, players }) => {
+    const [activeIndex, setActiveIndex] = useState(null);
+
+    const handleActiveIndex = (index) => {
+        if (players.length < 2) return;
+        setActiveIndex(index);
+    };
+
+    useEffect(() => {
+        if (players.every(player => player.ready === false))
+            setActiveIndex(null);
+    }, [players]);
+
     return (
         <>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '1rem' }}>
-                <Square value={<Loader />} disabled={true} />
-            </div>
             <div className="board-container">
                 {board.map((cell, index) => (
                     <Square
                         key={index}
                         value={index === 0 ? <Mountain /> : index === 1 ? <Scissors /> : <Newspaper />}
-                        onClick={() => onMove(index)}
-                        disabled={false}
+                        onClick={() => { handleActiveIndex(index); onMove(index) }}
+                        disabled={activeIndex !== null}
+                        isActive={activeIndex === index}
                     />
                 ))}
             </div>
@@ -22,12 +32,12 @@ const RockPaperScissorsPanel = ({ board, onMove }) => {
     );
 };
 
-const Square = ({ value, onClick, disabled }) => {
+const Square = ({ value, onClick, isActive, disabled }) => {
     return (
         <button
             onClick={onClick}
+            className={`square ${isActive ? "active_RPS" : ""}`}
             disabled={disabled}
-            className={`square ${!disabled ? "" : "loader"}`}
             style={{
                 color: 'var(--color-secondary)',
                 textShadow: '0 0 10px var(--color-secondary-glow)'

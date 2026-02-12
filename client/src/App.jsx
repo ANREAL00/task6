@@ -50,12 +50,12 @@ function App() {
       if (screen !== 'game_rock_paper_scissors') setScreen('game_rock_paper_scissors');
     });
 
-    socket.on('update_board', ({ board, turn }) => {
-      setLobby(prev => ({ ...prev, board, turn }));
+    socket.on('update_board', ({ board, turn, players }) => {
+      setLobby(prev => ({ ...prev, board, turn, players }));
     });
 
-    socket.on('game_over', ({ winner, board }) => {
-      setLobby(prev => ({ ...prev, board, winner }));
+    socket.on('game_over', ({ winner, board, players }) => {
+      setLobby(prev => ({ ...prev, board, winner, players }));
     });
 
     socket.on('rematch_update', ({ rematch }) => {
@@ -112,8 +112,8 @@ function App() {
     socket.emit('create_lobby_with_bot');
   };
 
-  const handleJoinGameTicTacToe = (roomId) => {
-    socket.emit('join_tic_tac_toe_lobby', roomId);
+  const handleJoinGame = (roomId) => {
+    socket.emit('join_lobby', roomId);
   };
 
   const handlePlayWithBot = (roomId) => {
@@ -121,15 +121,15 @@ function App() {
   };
 
   const handleTicTacToeMove = (roomId, index) => {
-    socket.emit('make_move', { roomId, index, username });
+    socket.emit('make_move_tictactoe', { roomId, index, username });
   };
 
   const handleRockPaperScissorsMove = (roomId, index) => {
     socket.emit('make_rock_paper_scissors_move', { roomId, index, username });
   };
 
-  const handlePlayAgain = (roomId) => {
-    socket.emit('play_again', roomId);
+  const handlePlayAgain = (roomId, type) => {
+    socket.emit('play_again', roomId, type);
   };
 
   const handleLeave = (roomId) => {
@@ -147,7 +147,7 @@ function App() {
           username={username}
           onCreateGame={handleCreateGameTicTacToe}
           onCreateGameRPS={handleCreateGameRPS}
-          onJoinGame={handleJoinGameTicTacToe}
+          onJoinGame={handleJoinGame}
           onCreateGameWithBot={handleCreateGameWithBot}
         />
       )}

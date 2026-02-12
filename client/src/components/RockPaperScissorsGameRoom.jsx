@@ -1,10 +1,9 @@
 import React from 'react';
 import { message } from 'antd';
 import RockPaperScissorsPanel from './RockPaperScissorsPanel';
-import { Copy, RefreshCw, LogOut } from 'lucide-react';
+import { Copy, RefreshCw, LogOut, Mountain, Newspaper, Scissors, Loader } from 'lucide-react';
 
 const RockPaperScissorsGameRoom = ({ lobby, username, onMove, onPlayAgain, onLeave }) => {
-    const isMyTurn = lobby.turn === lobby.players.find(p => p.username === username)?.id;
     const me = lobby.players.find(p => p.username === username);
     const opponent = lobby.players.find(p => p.username !== username);
 
@@ -32,15 +31,23 @@ const RockPaperScissorsGameRoom = ({ lobby, username, onMove, onPlayAgain, onLea
             )}
 
             <div className="players-container">
-                <PlayerBadge player={me} isTurn={lobby.turn === me.id} label='YOU' />
+                <PlayerBadge player={me} label='YOU' />
                 <div style={{ display: 'flex', alignItems: 'center', fontSize: '1.5rem', fontWeight: 'bold', color: '#64748b' }}>VS</div>
-                <PlayerBadge player={opponent} isTurn={opponent && lobby.turn === opponent.id} label='OPPONENT' />
+                <PlayerBadge player={opponent} label='OPPONENT' />
+            </div>
+
+            <div className="oponent-turn">
+                {lobby.winner && lobby.players.find(p => p.username !== username).turn !== undefined && lobby.players.find(p => p.username !== username).turn === 'rock' ? <Mountain size={40} /> :
+                    lobby.winner && lobby.players.find(p => p.username !== username).turn !== undefined && lobby.players.find(p => p.username !== username).turn === 'paper' ? <Newspaper size={40} /> :
+                        lobby.winner && lobby.players.find(p => p.username !== username).turn !== undefined && lobby.players.find(p => p.username !== username).turn === 'scissors' ? <Scissors size={40} /> : <Loader size={40} />
+                }
             </div>
 
             <div style={{ margin: '0 auto' }}>
                 <RockPaperScissorsPanel
                     board={lobby.board}
                     onMove={(index) => onMove(lobby.id, index)}
+                    players={lobby.players}
                 />
             </div>
 
@@ -49,9 +56,9 @@ const RockPaperScissorsGameRoom = ({ lobby, username, onMove, onPlayAgain, onLea
                     <div className="fade-in">
                         <h3 style={{
                             fontSize: '1.5rem',
-                            color: lobby.winner === 'draw' ? 'var(--color-text)' : (lobby.winner === me.symbol ? 'var(--color-success)' : 'var(--color-error)')
+                            color: lobby.winner === 'draw' ? 'var(--color-text)' : (lobby.winner === me.username ? 'var(--color-success)' : 'var(--color-error)')
                         }}>
-                            {lobby.winner === 'draw' ? "It's a Draw!" : (lobby.winner === me.symbol ? "You Won!" : "You Lost")}
+                            {lobby.winner === 'draw' ? "It's a Draw!" : (lobby.winner === me.username ? "You Won!" : "You Lost")}
                         </h3>
                         {lobby.rematch && !lobby.playWithBot && lobby.rematch.includes(me.id) ? (
                             <p style={{ marginTop: '1rem', color: 'var(--color-primary)', fontWeight: 'bold' }}>
@@ -59,25 +66,17 @@ const RockPaperScissorsGameRoom = ({ lobby, username, onMove, onPlayAgain, onLea
                             </p>
                         ) : (!lobby.playWithBot &&
                             <button
-                                onClick={() => onPlayAgain(lobby.id)}
+                                onClick={() => onPlayAgain(lobby.id, lobby.type)}
                                 style={{ marginTop: '1rem', background: 'var(--color-primary)', display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'white' }}
                             >
                                 <RefreshCw size={18} /> Play Again
                             </button>
                         )}
-                        {lobby.playWithBot && (
-                            <button
-                                onClick={() => onPlayWithBot(lobby.id)}
-                                style={{ marginTop: '1rem', background: 'var(--color-primary)', display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'white' }}
-                            >
-                                <Bot size={18} /> Play with Bot
-                            </button>
-                        )}
                     </div>
                 ) : (
                     <div>
-                        <p style={{ fontSize: '1.2rem', color: isMyTurn ? 'var(--color-primary)' : 'var(--color-text-dim)' }}>
-                            {isMyTurn ? "Your Turn" : (opponent ? `Waiting for ${opponent.username}...` : "Waiting for opponent to join...")}
+                        <p style={{ fontSize: '1.2rem', color: 'var(--color-primary)' }}>
+                            {lobby.players.every(p => p.ready) ? "Waiting for opponent to make a move" : (opponent ? `Not all players are ready` : "Waiting for opponent to join...")}
                         </p>
                         {!opponent && (
                             <p style={{ fontSize: '0.9rem', color: 'var(--color-text-dim)', marginTop: '0.5rem' }}>
@@ -96,7 +95,7 @@ const RockPaperScissorsGameRoom = ({ lobby, username, onMove, onPlayAgain, onLea
     );
 };
 
-const PlayerBadge = ({ player, isTurn, label }) => {
+const PlayerBadge = ({ player, label }) => {
     if (!player) return (
         <div className="player-badge" style={{ opacity: 0.5 }}>
             <div className="player-symbol empty"></div>
@@ -106,11 +105,11 @@ const PlayerBadge = ({ player, isTurn, label }) => {
 
     return (
         <div className="player-badge" style={{
-            opacity: isTurn ? 1 : 0.6,
-            transform: isTurn ? 'scale(1.1)' : 'scale(1)'
+            opacity: 1,
+            transform: 'scale(1.1)'
         }}>
             <div className={`player-symbol ${player.symbol === 'X' ? 'x' : 'o'}`} style={{
-                boxShadow: isTurn ? `0 0 15px ${player.symbol === 'X' ? 'var(--color-secondary)' : 'var(--color-primary)'}` : 'none'
+                boxShadow: `0 0 15px var(--color-secondary)`
             }}>
                 {player.symbol}
             </div>
