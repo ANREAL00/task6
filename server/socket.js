@@ -103,10 +103,10 @@ function handleBotMove(io, roomId) {
 
         if (result) {
             lobby.winner = result;
-            io.to(roomId).emit('game_over', { winner: result, board: lobby.board });
+            io.to(roomId).emit('game_over', { winner: result, board: lobby.board, players: lobby.players });
         } else {
             lobby.turn = humanPlayer.id;
-            io.to(roomId).emit('update_board', { board: lobby.board, turn: lobby.turn });
+            io.to(roomId).emit('update_board', { board: lobby.board, turn: lobby.turn, players: lobby.players });
         }
     }, 600);
 }
